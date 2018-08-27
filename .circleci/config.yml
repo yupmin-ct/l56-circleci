@@ -26,28 +26,29 @@ jobs:
     # Download and cache dependencies
     - restore_cache:
         keys:
-        - v1-dependencies-{{ checksum "composer.json" }}
+        - composer-v1-{{ checksum "composer.lock" }}
         # fallback to using the latest cache if no exact match is found
-        - v1-dependencies-
+        - composer-v1-
 
     - run: composer install -n --prefer-dist
 
     - save_cache:
         paths:
         - ./vendor
-        key: v1-dependencies-{{ checksum "composer.json" }}
+        key: composer-v1-{{ checksum "composer.lock" }}
 
     # node cache
     - restore_cache:
         keys:
-        - node-v3-{{ checksum "package.json" }}
-        - node-v3-
+        - node-v1-{{ checksum "package.json" }}
+        - node-v1-
+
     - run: yarn install
+
     - save_cache:
-        key: node-v3-{{ checksum "package.json" }}
+        key: node-v1-{{ checksum "package.json" }}
         paths:
         - node_modules
-        - ~/.yarn
 
     # generate key
     - run: php artisan key:generate
