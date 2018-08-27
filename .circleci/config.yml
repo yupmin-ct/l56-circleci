@@ -19,6 +19,10 @@ jobs:
     steps:
     - checkout
 
+    - run:
+        name: Setup Laravel testing environment variables for CircleCI test
+        command: cp .env.example .env
+
     # Download and cache dependencies
     - restore_cache:
         keys:
@@ -33,5 +37,20 @@ jobs:
         - ./vendor
         key: v1-dependencies-{{ checksum "composer.json" }}
 
+    # node cache
+    - restore_cache:
+        keys:
+        - node-v3-{{ checksum "package.json" }}
+        - node-v3-
+    - run: yarn install
+    - save_cache:
+        key: node-v3-{{ checksum "package.json" }}
+        paths:
+        - node_modules
+        - ~/.yarn
+
+    # generate key
+    - run: php artisan key:generate
+
     # run tests!
-    - run: phpunit
+    - run: vendor/bin/phpunit
